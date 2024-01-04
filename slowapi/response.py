@@ -1,21 +1,19 @@
 try:
     import asyncio as aio
-    import os
 except ImportError:
     import uasyncio as aio
-    import uos as os
 
 CONTENT_TYPES = {
-    ".html": "text/html",
-    ".css": "text/css",
-    ".js": "text/javascript",
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".gif": "image/gif",
-    ".svg": "image/svg+xml",
-    ".ico": "image/x-icon",
-    ".json": "application/json",
+    "html": "text/html",
+    "css": "text/css",
+    "js": "text/javascript",
+    "png": "image/png",
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "gif": "image/gif",
+    "svg": "image/svg+xml",
+    "ico": "image/x-icon",
+    "json": "application/json",
 }
 
 
@@ -35,7 +33,7 @@ class Response:
         self.http_version = "HTTP/1.1"
 
     def __repr__(self):
-        return f"<Response {self.status}>"
+        return f"<Response {self.status_code}>"
 
     def redirect(self, location, status_code=302):
         """
@@ -58,7 +56,6 @@ class Response:
         max_age=None,
         expires=None,
         path="/",
-        domain=None,
     ):
         """
         Adds a cookie to the response.
@@ -82,8 +79,6 @@ class Response:
             cookie += "; Expires=%s" % expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
         if path:
             cookie += f"; Path={path}"
-        if domain:
-            cookie += f"; Domain={domain}"
 
         if "Set-Cookie" in self.headers:
             self.headers["Set-Cookie"] += f", {cookie}"
@@ -136,27 +131,21 @@ def send_file(path, mimetype=None, download_name=None):
     Returns:
         Response: The response object.
     """
-    if ".." in path or path.startswith("/"):
-        return Response("Not found", 404)
-
-    if not os.path.exists(path):
+    if ".." in path:
         return Response("Not found", 404)
 
     try:
         with open(path, "rb") as f:
             data = f.read()
-    except FileNotFoundError:
+    except OSError:
         return Response("Not found", 404)
-    except IsADirectoryError:
-        return Response("Not found", 404)
-    except PermissionError:
-        return Response("Forbidden", 403)
 
     # Get the content type
     if not mimetype:
         mimetype = "application/octet-stream"
-        if os.path.splitext(path)[1] in CONTENT_TYPES:
-            mimetype = CONTENT_TYPES[os.path.splitext(path)[1]]
+        extension = path.split(".")[-1].lower()
+        if extension in CONTENT_TYPES:
+            mimetype = CONTENT_TYPES[extension]
         else:
             print(f"Unknown content type for file {path}")
 

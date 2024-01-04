@@ -8,7 +8,6 @@ try:
 except ImportError:
     import ujson as json
 
-import os
 import time
 
 from slowapi.request import Request
@@ -51,17 +50,6 @@ class SlowAPI:
 
         return wrapper
 
-    def serve_static(
-        self,
-        request: Request,
-        prefix: str,
-        directory: str,
-    ):
-        return send_file(
-            os.path.join(directory, request.path[len(prefix):]),
-        )
-
-
     def add_static_route(self, prefix, directory):
         """
         Register a static route.
@@ -76,6 +64,9 @@ class SlowAPI:
         """
         if not prefix.endswith("/"):
             prefix += "/"
+        if not directory.endswith("/"):
+            directory += "/"
+
         self.static_routes[prefix] = directory
 
         if self.debug:
@@ -95,8 +86,10 @@ class SlowAPI:
         """
         for prefix, directory in self.static_routes.items():
             if request.path.startswith(prefix):
-                response = self.serve_static(request, prefix, directory)
-                return response
+                path = f"{directory}{request.path[len(prefix):]}"
+                if self.debug:
+                    print(f"Sending file: {path}")
+                return send_file(path)
 
         return None
 
@@ -196,7 +189,6 @@ class SlowAPI:
     def run(self, host: str = "127.0.0.1", port: int = 8000):
         print(f"Starting server on {host}:{port}...")
 
-        # Create a new asyncio event loop
         loop = aio.get_event_loop()
         loop.create_task(aio.start_server(self.handle_request, host, port))
         loop.run_forever()
