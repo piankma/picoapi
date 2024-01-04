@@ -1,3 +1,3 @@
-document.on('ready', function() {
-  console.log('ready');
+document.addEventListener("DOMContentLoaded", function (event) {
+  alert("Dzień dobry!");
 });

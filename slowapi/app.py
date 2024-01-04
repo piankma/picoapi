@@ -87,8 +87,6 @@ class SlowAPI:
         for prefix, directory in self.static_routes.items():
             if request.path.startswith(prefix):
                 path = f"{directory}{request.path[len(prefix):]}"
-                if self.debug:
-                    print(f"Sending file: {path}")
                 return send_file(path)
 
         return None
