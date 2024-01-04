@@ -3,5 +3,7 @@ venv
 
 .env*
 
-.idea
-.vscode
+.idea/**
+.vscode/**
+.history/**
+
