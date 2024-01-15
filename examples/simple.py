@@ -5,13 +5,13 @@ try:
 except ImportError:
     host = "127.0.0.1"
 
-from slowapi.app import SlowAPI
+from slowapi import SlowAPI
 
 # creating an instance of SlowAPI
 app = SlowAPI(debug=True)
 
 # registering a static route
-app.add_static_route("/static", "/static")
+app.add_static_route("/static", "./static")
 
 
 @app.route("/")
