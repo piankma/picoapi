@@ -316,7 +316,7 @@ class SlowAPI:
                 self.routes[(method, path)] = handler
 
             if self.debug:
-                print(f"Registering route {path} -> {handler.__name__}()")
+                print("Registering route %s -> %s()" % (path, getattr(handler, "__name__", "function")))
 
             return handler
 
@@ -445,6 +445,8 @@ class SlowAPI:
             response.headers["Server-Timing"] = f"req;dur={real_end}ms"
 
             print(log_string)
+            print(gc.mem_alloc(), gc.mem_free())
+
 
         await response.send(writer)
         await writer.wait_closed()
@@ -460,6 +462,8 @@ class SlowAPI:
         print(f"Starting server on {host}:{port}...")
 
         gc.collect()
+        if self.debug:
+            print(gc.mem_alloc(), gc.mem_free())
 
         loop = aio.get_event_loop()
         loop.create_task(aio.start_server(self.handle_request, host, port))
