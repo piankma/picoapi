@@ -1,6 +1,7 @@
-SlowAPI
+picoAPI
 ===
-SlowAPI is a microframework for simple asynchronous web applications built with MicroPython for your microcontroller.
+picoAPI is a server and framework for simple asynchronous web applications built with MicroPython for your microcontroller.
+Of course, it will run also on CPython. But it's designed primarily for the uPy.
 
 **Consider this an alpha release for now. APIs might change.**
 
@@ -15,9 +16,9 @@ See [./examples](/examples) directory.
 Basically, it's interface is the same as you normally would see on [Flask](https://github.com/pallets/flask) or [FastAPI](https://github.com/tiangolo/fastapi).
 
 ```py
-from slowapi import SlowAPI
+from picoapi import Server
 
-app = SlowAPI(debug=True)
+app = Server(debug=True)
 app.add_static_route("/static", "./static")
 
 @app.route("/hello")
@@ -32,8 +33,8 @@ app.run("192.168.4.1", 8000)
 ### 192.168.4.2:12345: GET /hello 201 (43ms)
 ```
 
-In the above example, a function needs to have two params: `req` and `resp`, which is obviously `Request` and `Response` object.
+In the above example, a function needs to have two params: `req` and `resp`, which are obviously `Request` and `Response` object.
 
 
 ### Dependencies
-SlowAPI depends only on `(u)asyncio`
+picoAPI depends only on `(u)asyncio`
