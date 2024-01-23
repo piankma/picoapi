@@ -3,10 +3,11 @@ import json
 import time
 
 try:
-    import gc
+    from gc import collect
+
     from micropython import const
 except ImportError:
-    gc = None
+    collect = None
     const = lambda x: x
 
 from picoapi.request import Request
@@ -177,6 +178,7 @@ class Server:
             request.source_ip, request.source_port = writer.get_extra_info("peername")
         elif isinstance(peername, (bytes, bytearray)):
             import socket
+
             _, ip, request.source_port = socket.sockaddr(peername)
             request.source_ip = ".".join(str(b) for b in ip)
 
@@ -210,8 +212,9 @@ class Server:
         """
         print(f"Starting server on {host}:{port}...")
 
-        if gc:
-            gc.collect()
+        # run garbage collection if micropython is available
+        if collect:
+            collect()
 
         loop = aio.get_event_loop()
         loop.create_task(aio.start_server(self.handle_request, host, port))
